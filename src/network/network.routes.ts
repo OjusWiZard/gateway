@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { NextFunction, Request, Response, Router } from 'express';
 import * as ethereumControllers from '../chains/ethereum/ethereum.controllers';
-import { Ethereumish } from '../services/common-interfaces';
+import * as tezosControllers from '../chains/tezos/tezos.controllers';
+import { Ethereumish, Tezosish } from '../services/common-interfaces';
 import { ConfigManagerV2 } from '../services/config-manager-v2';
 import { getChain } from '../services/connection-manager';
 import { asyncHandler } from '../services/error-handler';
@@ -26,6 +27,7 @@ import {
   validateChain as validateEthereumChain,
   validateNetwork as validateEthereumNetwork,
 } from '../chains/ethereum/ethereum.validators';
+import { validateTezosBalanceRequest } from '../chains/tezos/tezos.validators';
 
 export const validatePollRequest: RequestValidator = mkRequestValidator([
   validateTxHash,
@@ -63,15 +65,27 @@ export namespace NetworkRoutes {
         res: Response<BalanceResponse | string, {}>,
         _next: NextFunction
       ) => {
-        validateEthereumBalanceRequest(req.body);
-        const chain = await getChain<Ethereumish>(
-          req.body.chain,
-          req.body.network
-        );
+        if (req.body.chain === 'tezos') {
+          validateTezosBalanceRequest(req.body);
+          const chain = await getChain<Tezosish>(
+            req.body.chain,
+            req.body.network
+          );
+          res
+            .status(200)
+            .json(await tezosControllers.balances(chain, req.body));
 
-        res
-          .status(200)
-          .json(await ethereumControllers.balances(chain, req.body));
+        } else {
+          validateEthereumBalanceRequest(req.body);
+          const chain = await getChain<Ethereumish>(
+            req.body.chain,
+            req.body.network
+          );
+          res
+            .status(200)
+            .json(await ethereumControllers.balances(chain, req.body));
+
+        }
       }
     )
   );

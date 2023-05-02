@@ -37,6 +37,18 @@ export const isCosmosPrivateKey = (str: string): boolean => {
   }
 };
 
+export const isTezosPrivateKey = (str: string): boolean => {
+  try {
+    const prefix = str.substring(0, 4);
+    if (prefix !== 'edsk' && prefix !== 'spsk' && prefix !== 'p2sk') {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // given a request, look for a key called privateKey that is an Ethereum private key
 export const validatePrivateKey: Validator = mkSelectingValidator(
   'chain',
@@ -93,6 +105,11 @@ export const validatePrivateKey: Validator = mkSelectingValidator(
       invalidEthPrivateKeyError,
       (val) => typeof val === 'string' && isEthPrivateKey(val)
     ),
+    tezos: mkValidator(
+      'privateKey',
+      invalidEthPrivateKeyError,
+      (val) => typeof val === 'string' && isTezosPrivateKey(val)
+    )
   }
 );
 
@@ -123,7 +140,9 @@ export const validateChain: Validator = mkValidator(
       val === 'cronos' ||
       val === 'cosmos' ||
       val === 'binance-smart-chain' ||
-      val === 'injective')
+      val === 'injective' ||
+      val === 'tezos'
+    )
 );
 
 export const validateNetwork: Validator = mkValidator(

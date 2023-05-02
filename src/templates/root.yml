@@ -107,3 +107,7 @@ configurations:
   $namespace zigzag:
     configurationPath: zigzag.yml
     schemaPath: zigzag-schema.json
+
+  $namespace tezos:
+    configurationPath: tezos.yml
+    schemaPath: tezos-schema.json

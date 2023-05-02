@@ -21,6 +21,7 @@ import { AmmRoutes, AmmLiquidityRoutes, PerpAmmRoutes } from './amm/amm.routes';
 import { InjectiveRoutes } from './chains/injective/injective.routes';
 import { NearRoutes } from './chains/near/near.routes';
 import { CLOBRoutes, PerpClobRoutes } from './clob/clob.routes';
+import { TezosRoutes } from './chains/tezos/tezos.routes';
 
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
@@ -60,6 +61,7 @@ gatewayApp.use('/clob', CLOBRoutes.router);
 gatewayApp.use('/clob/perp', PerpClobRoutes.router);
 gatewayApp.use('/cosmos', CosmosRoutes.router);
 gatewayApp.use('/near', NearRoutes.router);
+gatewayApp.use('/tezos', TezosRoutes.router);
 
 // a simple route to test that the server is running
 gatewayApp.get('/', (_req: Request, res: Response) => {

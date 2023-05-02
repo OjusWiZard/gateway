@@ -11,6 +11,7 @@ import { Harmony } from '../chains/harmony/harmony';
 import { Polygon } from '../chains/polygon/polygon';
 import { Injective } from '../chains/injective/injective';
 import { Xdc } from '../chains/xdc/xdc';
+import { Tezos } from '../chains/tezos/tezos';
 import {
   HttpException,
   UNKNOWN_CHAIN_ERROR_CODE,
@@ -19,7 +20,7 @@ import {
 import { EthereumBase, TokenInfo } from '../chains/ethereum/ethereum-base';
 import { Cronos } from '../chains/cronos/cronos';
 import { Near } from '../chains/near/near';
-import { Nearish, Xdcish } from '../services/common-interfaces';
+import { Nearish, Tezosish, Xdcish } from '../services/common-interfaces';
 
 export async function getStatus(
   req: StatusRequest
@@ -51,6 +52,8 @@ export async function getStatus(
       connections.push(await Cronos.getInstance(req.network as string));
     } else if (req.chain === 'injective') {
       connections.push(Injective.getInstance(req.network as string));
+    } else if (req.chain === 'tezos') {
+      connections.push(Tezos.getInstance(req.network as string));
     } else {
       throw new HttpException(
         500,
@@ -78,10 +81,12 @@ export async function getStatus(
     connections = connections.concat(
       polygonConnections ? Object.values(polygonConnections) : []
     );
+
     const xdcConnections = Xdc.getConnectedInstances();
     connections = connections.concat(
       xdcConnections ? Object.values(xdcConnections) : []
     );
+
     const cronosConnections = Cronos.getConnectedInstances();
     connections = connections.concat(
       cronosConnections ? Object.values(cronosConnections) : []
@@ -100,6 +105,11 @@ export async function getStatus(
     const injectiveConnections = Injective.getConnectedInstances();
     connections = connections.concat(
       injectiveConnections ? Object.values(injectiveConnections) : []
+    );
+
+    const tezosConnections = Tezos.getConnectedInstances();
+    connections = connections.concat(
+      tezosConnections ? Object.values(tezosConnections) : []
     );
   }
 
@@ -130,7 +140,7 @@ export async function getStatus(
 }
 
 export async function getTokens(req: TokensRequest): Promise<TokensResponse> {
-  let connection: EthereumBase | Nearish | Injective | Xdcish;
+  let connection: EthereumBase | Nearish | Injective | Xdcish | Tezosish;
   let tokens: TokenInfo[] = [];
 
   if (req.chain && req.network) {
@@ -152,6 +162,8 @@ export async function getTokens(req: TokensRequest): Promise<TokensResponse> {
       connection = await Cronos.getInstance(req.network);
     } else if (req.chain === 'injective') {
       connection = Injective.getInstance(req.network);
+    } else if (req.chain === 'tezos') {
+      connection = Tezos.getInstance(req.network);
     } else {
       throw new HttpException(
         500,

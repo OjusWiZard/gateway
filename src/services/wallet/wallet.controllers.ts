@@ -8,6 +8,7 @@ import { Xdc } from '../../chains/xdc/xdc';
 import { Cosmos } from '../../chains/cosmos/cosmos';
 import { Harmony } from '../../chains/harmony/harmony';
 import { Injective } from '../../chains/injective/injective';
+import { Tezos } from '../../chains/tezos/tezos';
 
 import {
   AddWalletRequest,
@@ -55,7 +56,7 @@ export async function addWallet(
   if (!passphrase) {
     throw new Error('There is no passphrase');
   }
-  let connection: EthereumBase | Near | Cosmos | Injective | Xdc;
+  let connection: EthereumBase | Near | Cosmos | Injective | Xdc | Tezos;
   let address: string | undefined;
   let encryptedPrivateKey: string | undefined;
 
@@ -85,6 +86,8 @@ export async function addWallet(
     connection = Xdc.getInstance(req.network);
   } else if (req.chain === 'injective') {
     connection = Injective.getInstance(req.network);
+  } else if (req.chain === 'tezos') {
+    connection = Tezos.getInstance(req.network);
   } else {
     throw new HttpException(
       500,
@@ -145,6 +148,13 @@ export async function addWallet(
       } else {
         throw new Error('Injective wallet requires a subaccount id');
       }
+    } else if (connection instanceof Tezos) {
+      const tezosWallet = await connection.getWalletFromPrivateKey(req.privateKey);
+      address = await tezosWallet.signer.publicKeyHash();
+      encryptedPrivateKey = connection.encrypt(
+        req.privateKey,
+        passphrase
+      );
     }
 
     if (address === undefined || encryptedPrivateKey === undefined) {

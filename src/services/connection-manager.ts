@@ -5,6 +5,7 @@ import { BinanceSmartChain } from '../chains/binance-smart-chain/binance-smart-c
 import { Harmony } from '../chains/harmony/harmony';
 import { Polygon } from '../chains/polygon/polygon';
 import { Xdc } from '../chains/xdc/xdc';
+import { Tezos } from '../chains/tezos/tezos';
 import { MadMeerkat } from '../connectors/mad_meerkat/mad_meerkat';
 import { Openocean } from '../connectors/openocean/openocean';
 import { Pangolin } from '../connectors/pangolin/pangolin';
@@ -27,6 +28,7 @@ import {
   Uniswapish,
   UniswapLPish,
   Xdcish,
+  Tezosish
 } from './common-interfaces';
 import { Traderjoe } from '../connectors/traderjoe/traderjoe';
 import { Sushiswap } from '../connectors/sushiswap/sushiswap';
@@ -37,7 +39,7 @@ import { Ref } from '../connectors/ref/ref';
 import { Xsswap } from '../connectors/xsswap/xsswap';
 import { DexalotCLOB } from '../connectors/dexalot/dexalot';
 
-export type ChainUnion = Ethereumish | Nearish | Injective | Xdcish;
+export type ChainUnion = Ethereumish | Nearish | Injective | Xdcish | Tezosish;
 
 export type Chain<T> = T extends Ethereumish
   ? Ethereumish
@@ -47,6 +49,8 @@ export type Chain<T> = T extends Ethereumish
   ? Xdcish
   : T extends Injective
   ? Injective
+  : T extends Tezosish
+  ? Tezosish
   : never;
 
 export async function getChain<T>(
@@ -67,6 +71,7 @@ export async function getChain<T>(
   else if (chain === 'cronos') chainInstance = Cronos.getInstance(network);
   else if (chain === 'injective')
     chainInstance = Injective.getInstance(network);
+  else if (chain === 'tezos') chainInstance = Tezos.getInstance(network);
   else throw new Error('unsupported chain');
 
   if (!chainInstance.ready()) {
