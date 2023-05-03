@@ -33,7 +33,7 @@ import {
 import { EthereumBase } from '../../chains/ethereum/ethereum-base';
 import { Near } from '../../chains/near/near';
 import { getChain } from '../connection-manager';
-import { Ethereumish } from '../common-interfaces';
+import { Ethereumish, Tezosish } from '../common-interfaces';
 
 export function convertXdcAddressToEthAddress(publicKey: string): string {
   return publicKey.length === 43 && publicKey.slice(0, 3) === 'xdc'
@@ -181,9 +181,15 @@ export async function removeWallet(req: RemoveWalletRequest): Promise<void> {
 export async function signMessage(
   req: WalletSignRequest
 ): Promise<WalletSignResponse> {
-  const chain: Ethereumish = await getChain(req.chain, req.network);
-  const wallet = await chain.getWallet(req.address);
-  return { signature: await wallet.signMessage(req.message) };
+  if (req.chain === 'tezos') {
+    const chain = await getChain<Tezosish>(req.chain, req.network);
+    const wallet = await chain.getWallet(req.address);
+    return { signature: (await wallet.signer.sign("0x03" + req.message)).sbytes.slice(4) };
+  } else {
+    const chain = await getChain<Ethereumish>(req.chain, req.network);
+    const wallet = await chain.getWallet(req.address);
+    return { signature: await wallet.signMessage(req.message) };
+  }
 }
 
 export async function getDirectories(source: string): Promise<string[]> {
