@@ -18,6 +18,7 @@ import {
   UNKNOWN_KNOWN_CHAIN_ERROR_MESSAGE,
 } from '../services/error-handler';
 import { EthereumBase, TokenInfo } from '../chains/ethereum/ethereum-base';
+import { TokenInfo as TezosTokenInfo } from '../chains/tezos/tezos.base';
 import { Cronos } from '../chains/cronos/cronos';
 import { Near } from '../chains/near/near';
 import { Nearish, Tezosish, Xdcish } from '../services/common-interfaces';
@@ -141,7 +142,7 @@ export async function getStatus(
 
 export async function getTokens(req: TokensRequest): Promise<TokensResponse> {
   let connection: EthereumBase | Nearish | Injective | Xdcish | Tezosish;
-  let tokens: TokenInfo[] = [];
+  let tokens: (TokenInfo | TezosTokenInfo)[] = [];
 
   if (req.chain && req.network) {
     if (req.chain === 'avalanche') {
@@ -187,7 +188,7 @@ export async function getTokens(req: TokensRequest): Promise<TokensResponse> {
     tokens = connection.storedTokenList;
   } else {
     for (const t of req.tokenSymbols as []) {
-      tokens.push(connection.getTokenForSymbol(t) as TokenInfo);
+      tokens.push(connection.getTokenForSymbol(t)!);
     }
   }
 
