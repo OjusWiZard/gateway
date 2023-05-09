@@ -753,6 +753,7 @@ export interface Cosmosish extends CosmosBase {
 
 export interface Tezosish extends TezosBase {
   gasPrice: number;
+  gasLimitTransaction: number;
   nativeTokenSymbol: string;
   chain: string;
 }
