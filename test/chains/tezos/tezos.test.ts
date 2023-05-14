@@ -35,8 +35,8 @@ describe('Tezos', () => {
         expect(tezos.nativeTokenSymbol).toEqual('XTZ');
     });
 
-    it('should have a gas price of 100', () => {
-        expect(tezos.gasPrice).toEqual(100);
+    it('should have a gas price of 12500', () => {
+        expect(tezos.gasPrice).toEqual(12500);
     });
 
     it('should have a gas limit of 2600000', () => {
